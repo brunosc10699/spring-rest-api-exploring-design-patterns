@@ -2,7 +2,7 @@
 
 First of all, I wanna thanks to [MSc Venilton Falvo Jr](https://linkedin.com/in/falvojr), Tech Lead at DIO (Digital Innovation One) for his classes about Design Patterns. He's been contributed a lot to my growth in software development.
 
-If you also wanna have free classes with him and other DIO's IT Experts, hit this link: https://lnkd.in/e2f-aeNX
+*If you also wanna have free classes with him and other DIO's IT Experts, hit this link: https://lnkd.in/e2f-aeNX*
 
 This repository contains a REST API in which I explore the following design patterns:
 
@@ -16,11 +16,11 @@ This repository contains a REST API in which I explore the following design patt
 
 Here is the conceptual model:
 
-![class-diagram](/home/windows/Vídeos/Explorando Padrões de Projeto na prática com java/Projeto/API Product Registration/delivered/images/class-diagram.jpg)
+![class-diagram.jpg](https://raw.githubusercontent.com/brunosc10699/spring-rest-api-exploring-design-patterns/main/.github/images/class-diagram.jpg)
 
 Here, you see how the objects are instantiated in memory:
 
-![objects-instantiated-in-memory](/home/windows/Vídeos/Explorando Padrões de Projeto na prática com java/Projeto/API Product Registration/delivered/images/objects-instantiated-in-memory.jpg)
+![objects-instantiated-in-memory.jpg](https://raw.githubusercontent.com/brunosc10699/spring-rest-api-exploring-design-patterns/main/.github/images/objects-instantiated-in-memory.jpg)
 
 Gradle project dependencies:
 
@@ -43,7 +43,6 @@ Gradle project dependencies:
    testImplementation group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
 ```
 
-Link to the "Brazilian Home Appliance Energy Consumption API" repository: https://github.com/brunosc10699/rest-api-spring-react-happliance
+Link to the "Brazilian Home Appliances' Energy Consumption API" repository: https://github.com/brunosc10699/rest-api-spring-react-happliance
 
-
-
+*Do you want to study software development for free? Hit this link: https://lnkd.in/e2f-aeNX*

@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "tb_energy_consumption")
@@ -12,7 +13,11 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class EnergyConsumption {
+public class EnergyConsumption implements Serializable {
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private static final long serialVersionUID = 1L;
 
     @Id
     private String name;

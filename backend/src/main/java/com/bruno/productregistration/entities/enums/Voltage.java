@@ -9,8 +9,8 @@ import lombok.Getter;
 public enum Voltage {
 
     MONOVOLTAGE127(0, "127V"),
-    MONOVOLTAGE230(1, "230v"),
-    BIVOLTAGE(2, "127v/230v");
+    MONOVOLTAGE230(1, "230V"),
+    BIVOLTAGE(2, "127V/230V");
 
     private Integer code;
     private String description;

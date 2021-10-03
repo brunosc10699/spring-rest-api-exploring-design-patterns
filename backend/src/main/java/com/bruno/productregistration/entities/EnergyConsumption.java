@@ -10,13 +10,11 @@ import java.io.Serializable;
 @Entity
 @Table(name = "tb_energy_consumption")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @Builder
 public class EnergyConsumption implements Serializable {
 
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private static final long serialVersionUID = 1L;
 
     @Id

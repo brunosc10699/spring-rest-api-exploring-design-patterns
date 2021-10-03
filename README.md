@@ -1,8 +1,8 @@
 # Exploring Design Patterns
 
-First of all, I wanna thanks to [MSc Venilton Falvo Jr](https://linkedin.com/in/falvojr), Tech Lead at DIO (Digital Innovation One) for his classes about Design Patterns. He's been contributed a lot to my growth in software development.
+First of all, I would like to thank [MSc Venilton Falvo Jr](https://linkedin.com/in/falvojr), technical lead at DIO (Digital Innovation One), for his classes on Design Patterns. It has contributed a lot to my growth in software development.
 
-*If you also wanna have free classes with him and other DIO's IT Experts, hit this link: https://lnkd.in/e2f-aeNX*
+*If anyone else would like to take free lessons from him and other IT experts at DIO, click this link : https://lnkd.in/e2f-aeNX*
 
 This repository contains a REST API in which I explore the following design patterns:
 
@@ -10,7 +10,6 @@ This repository contains a REST API in which I explore the following design patt
 	- Singleton
 	- Facade
 	- Builder
-	- DTO (Data Transfer Object)
 
 ## Product Registration
 

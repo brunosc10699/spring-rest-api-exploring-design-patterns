@@ -2,20 +2,20 @@ package com.bruno.productregistration.entities;
 
 import com.bruno.productregistration.entities.enums.Classification;
 import com.bruno.productregistration.entities.enums.Voltage;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "tb_home_appliance")
 @SuperBuilder
+@JsonTypeName("homeAppliance")
 public class HomeAppliance extends Product {
 
     @EqualsAndHashCode.Exclude
+    @Column(nullable = false)
     private Boolean portable;
 
     @EqualsAndHashCode.Exclude
@@ -24,20 +24,22 @@ public class HomeAppliance extends Product {
     private EnergyConsumption energyConsumption;
 
     @EqualsAndHashCode.Exclude
+    @Column(nullable = false)
     private Integer voltage;
 
     @EqualsAndHashCode.Exclude
+    @Column(nullable = false)
     private Integer classification;
 
-    public HomeAppliance() {
+    HomeAppliance() {
     }
 
-    public HomeAppliance(String id, String name, String description, Double price, Integer inventory, Boolean portable, EnergyConsumption energyConsumption, Voltage voltage, Classification classification) {
+    HomeAppliance(String id, String name, String description, Double price, Integer inventory, Boolean portable, EnergyConsumption energyConsumption, Voltage voltage, Classification classification) {
         super(id, name, description, price, inventory);
         this.portable = portable;
         this.energyConsumption = energyConsumption;
-        this.voltage = voltage.getCode();
-        this.classification = classification.getCode();
+        this.voltage = (voltage == null) ? null : voltage.getCode();
+        this.classification = (classification == null) ? null : classification.getCode();
     }
 
     public Boolean getPortable() {

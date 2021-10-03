@@ -1,5 +1,6 @@
 package com.bruno.productregistration.entities;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -9,21 +10,20 @@ import java.io.Serializable;
 @Entity
 @Table(name = "tb_product")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @SuperBuilder
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@Type")
 public abstract class Product implements Serializable {
 
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private static final long serialVersionUID = 1L;
+   private static final long serialVersionUID = 1L;
 
     @Id
     private String id;
 
     @EqualsAndHashCode.Exclude
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @EqualsAndHashCode.Exclude

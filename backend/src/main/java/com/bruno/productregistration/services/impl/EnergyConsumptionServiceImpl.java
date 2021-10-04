@@ -25,7 +25,7 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
     public EnergyConsumption save(EnergyConsumption consumption) {
         consumption = checkEnergyConsumptionObject(consumption);
         try {
-            return energyConsumptionRepository.save(consumption);
+            if (!consumption.equals(null)) return energyConsumptionRepository.save(consumption);
         } catch (NullPointerException e) {
             log.info("The EnergyConsumption object was null!");
         }
@@ -62,6 +62,12 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
         consumptionDTO.setName(name);
         EnergyConsumption consumption = energyConsumptionRepository.save(fromDTO(consumptionDTO));
         return EnergyConsumptionDTO.toDTO(consumption);
+    }
+
+    @Override
+    public void delete(String name) {
+        findById(name);
+        energyConsumptionRepository.deleteById(name);
     }
 
     private EnergyConsumption checkEnergyConsumptionObject(EnergyConsumption energyConsumption) {

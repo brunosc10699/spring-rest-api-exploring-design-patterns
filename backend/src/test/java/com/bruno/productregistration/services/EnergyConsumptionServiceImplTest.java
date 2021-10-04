@@ -139,7 +139,23 @@ public class EnergyConsumptionServiceImplTest {
 
     @Test
     @DisplayName("(10) When an invalid id is given to update data, then throw a ResourceNotFoundException exception")
-    void whenAnInvalidIdIsGivenThenThrowException() {
+    void whenAnInvalidIdIsGivenToUpdateThenThrowException() {
         assertThrows(ResourceNotFoundException.class, () -> energyConsumptionService.update(badDTO.getName(), badDTO));
+    }
+
+    @Test
+    @DisplayName("(11) When a valid id is given to delete data, then delete it")
+    void whenAValidIdIsGivenThenDeleteData() {
+        when(energyConsumptionRepository.findById(goodObject.getName())).thenReturn(Optional.of(goodObject));
+        doNothing().when(energyConsumptionRepository).deleteById(goodObject.getName());
+        energyConsumptionService.delete(goodDTO.getName());
+        verify(energyConsumptionRepository, times(1)).findById(goodObject.getName());
+        verify(energyConsumptionRepository, times(1)).deleteById(goodObject.getName());
+    }
+
+    @Test
+    @DisplayName("(12) When an invalid id is given to delete data, then throw a ResourceNotFoundException exception")
+    void whenAnInvalidIdIsGivenToDeleteThenThrowException() {
+        assertThrows(ResourceNotFoundException.class, () -> energyConsumptionService.delete(badDTO.getName()));
     }
 }

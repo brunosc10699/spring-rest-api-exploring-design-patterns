@@ -15,4 +15,6 @@ public interface HomeApplianceService {
     Page<HomeApplianceDTO> findAll(Pageable pageable);
 
     HomeApplianceDTO update(String id, HomeApplianceDTO homeApplianceDTO);
+
+    void delete(String id);
 }

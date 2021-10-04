@@ -22,8 +22,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class HomeApplianceServiceTest {
@@ -63,7 +62,7 @@ public class HomeApplianceServiceTest {
     private HomeApplianceDTO badDTO = HomeApplianceDTO.builder().build().toDTO(badObject);
 
     @Test
-    @DisplayName("(1) When giving a good HomeApplianceDTO object, then register a new product")
+    @DisplayName("(1) When given a good HomeApplianceDTO object, then register a new product")
     void whenGivingAGoodHomeApplianceDTOObjectThenSaveANewProduct() {
         when(homeApplianceRepository.save(goodObject)).thenReturn(goodObject);
         HomeApplianceDTO applianceDTO = homeApplianceService.save(goodDTO);
@@ -89,7 +88,7 @@ public class HomeApplianceServiceTest {
     }
 
     @Test
-    @DisplayName("(3) When giving a name then return a HomeApplianceDTO object")
+    @DisplayName("(3) When given a name then return a HomeApplianceDTO object")
     void whenGivingANameThenReturnADTOObject() {
         when(homeApplianceRepository.findByNameIgnoreCase(goodObject.getName())).thenReturn(Optional.of(goodObject));
         HomeApplianceDTO applianceDTO = homeApplianceService.findByNameIgnoreCase(goodDTO.getName());
@@ -100,14 +99,14 @@ public class HomeApplianceServiceTest {
     }
 
     @Test
-    @DisplayName("(4) When giving an unknown name then throw a ResourceNotFoundException")
+    @DisplayName("(4) When given an unknown name then throw a ResourceNotFoundException")
     void whenGivingAnUnknownNameThenThrowAnException() {
         doThrow(ResourceNotFoundException.class).when(homeApplianceRepository).findByNameIgnoreCase(badObject.getName());
         assertThrows(ResourceNotFoundException.class, () -> homeApplianceService.findByNameIgnoreCase(badDTO.getName()));
     }
 
     @Test
-    @DisplayName("(5) When giving a valid id, then return a HomeApplianceDTO object")
+    @DisplayName("(5) When given a valid id, then return a HomeApplianceDTO object")
     void whenGivingAValidIDThenReturnAHomeApplianceDTOObject() {
         when(homeApplianceRepository.findById(goodObject.getId())).thenReturn(Optional.of(goodObject));
         HomeApplianceDTO applianceDTO = homeApplianceService.findById(goodDTO.getId());
@@ -119,7 +118,7 @@ public class HomeApplianceServiceTest {
     }
 
     @Test
-    @DisplayName("(6) When giving an invalid id, then throw a ResourceNotFoundException")
+    @DisplayName("(6) When given an invalid id, then throw a ResourceNotFoundException")
     void whenGivingAnInvalidIDThenThrowAnException() {
         doThrow(ResourceNotFoundException.class).when(homeApplianceRepository).findById(badObject.getId());
         assertThrows(ResourceNotFoundException.class, () -> homeApplianceService.findById(badDTO.getId()));
@@ -154,7 +153,7 @@ public class HomeApplianceServiceTest {
     @Test
     @DisplayName("(9) Must update the home appliance registration by its id")
     void whenUpdateByIdIsCalledThenReturnTheUpdatedObject() {
-        when(homeApplianceRepository.findById(id)).thenReturn(Optional.of(goodObject));
+        when(homeApplianceRepository.findById(goodDTO.getId())).thenReturn(Optional.of(goodObject));
         when(homeApplianceRepository.save(goodObject)).thenReturn(goodObject);
         HomeApplianceDTO applianceDTO = homeApplianceService.update(goodDTO.getId(), goodDTO);
         assertAll(
@@ -174,16 +173,32 @@ public class HomeApplianceServiceTest {
     }
 
     @Test
-    @DisplayName("(10) When an invalid id is giving to update an appliance, then throw a ResourceNotFoundException exception")
+    @DisplayName("(10) When an invalid id is given to update an appliance, then throw a ResourceNotFoundException exception")
     void whenGivingAnInvalidIdThenThrowException() {
         doThrow(ResourceNotFoundException.class).when(homeApplianceRepository).findById(badDTO.getId());
         assertThrows(ResourceNotFoundException.class, () -> homeApplianceService.findById(badDTO.getId()));
     }
 
     @Test
-    @DisplayName("(11) When an existent name is giving to update an appliance, then throw a ExistingResourceException exception")
+    @DisplayName("(11) When an existent name is given to update an appliance, then throw an ExistingResourceException exception")
     void whenGivingAnInvalidNameThenThrowException() {
         doThrow(ExistingResourceException.class).when(homeApplianceRepository).findByNameIgnoreCase(badDTO.getName());
         assertThrows(ExistingResourceException.class, () -> homeApplianceService.findByNameIgnoreCase(badDTO.getName()));
+    }
+
+    @Test
+    @DisplayName("(12) When a valid id is given, delete the data from the database")
+    void whenAValidIdIsGivenThenDeleteTheDataFromTheDatabase() {
+        when(homeApplianceRepository.findById(goodObject.getId())).thenReturn(Optional.of(goodObject));
+        doNothing().when(homeApplianceRepository).deleteById(goodObject.getId());
+        homeApplianceService.delete(goodObject.getId());
+        verify(homeApplianceRepository, times(1)).findById(goodObject.getId());
+        verify(homeApplianceRepository, times(1)).deleteById(goodObject.getId());
+    }
+
+    @Test
+    @DisplayName("(13) When an invalid id is given, then throw a ResourceNotFoundException exception")
+    void whenAnInvalidIdIsGivenThenThrowException() {
+        assertThrows(ResourceNotFoundException.class, () -> homeApplianceService.delete(badDTO.getId()));
     }
 }

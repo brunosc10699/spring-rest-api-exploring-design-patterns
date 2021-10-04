@@ -71,6 +71,12 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
         return HomeApplianceDTO.toDTO(product);
     }
 
+    @Override
+    public void delete(String id) {
+        findById(id);
+        homeApplianceRepository.deleteById(id);
+    }
+
     private void saveEnergyConsumption(HomeApplianceDTO homeApplianceDTO) {
         EnergyConsumption consumption = homeApplianceDTO.getEnergyConsumption();
         try {

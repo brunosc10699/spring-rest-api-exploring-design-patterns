@@ -6,9 +6,11 @@ import com.bruno.productregistration.entities.HomeAppliance;
 import com.bruno.productregistration.repositories.HomeApplianceRepository;
 import com.bruno.productregistration.services.HomeApplianceService;
 import com.bruno.productregistration.services.exceptions.ExistingResourceException;
+import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -37,6 +39,14 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
         HomeAppliance product = fromHomeApplianceDTO(homeApplianceDTO);
         product = homeApplianceRepository.save(product);
         return HomeApplianceDTO.builder().build().toDTO(product);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public HomeApplianceDTO findByNameIgnoreCase(String name) {
+        HomeAppliance appliance = homeApplianceRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new ResourceNotFoundException(name));
+        return HomeApplianceDTO.builder().build().toDTO(appliance);
     }
 
     private void checkApplianceNameValidity(HomeApplianceDTO homeApplianceDTO) {

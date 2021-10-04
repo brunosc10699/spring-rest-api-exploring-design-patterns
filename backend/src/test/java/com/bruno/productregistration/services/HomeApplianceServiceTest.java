@@ -4,6 +4,7 @@ import com.bruno.productregistration.dto.HomeApplianceDTO;
 import com.bruno.productregistration.entities.HomeAppliance;
 import com.bruno.productregistration.repositories.HomeApplianceRepository;
 import com.bruno.productregistration.services.exceptions.ExistingResourceException;
+import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import com.bruno.productregistration.services.impl.HomeApplianceServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -81,17 +84,26 @@ public class HomeApplianceServiceTest {
     }
 
     @Test
-    @DisplayName("(3) When giving a bad HomeApplianceDTO object, then throw a validation exception")
+    @DisplayName("(3) When giving a name then return a HomeApplianceDTO object")
+    void whenGivingANameThenReturnADTOObject() {
+        when(homeApplianceRepository.findByNameIgnoreCase(goodObject.getName())).thenReturn(Optional.of(goodObject));
+        HomeApplianceDTO applianceDTO = homeApplianceService.findByNameIgnoreCase(goodDTO.getName());
+        assertAll(
+                () -> assertNotNull(applianceDTO.getId()),
+                () -> assertThat(applianceDTO.getName(), is(equalTo(goodDTO.getName())))
+        );
+    }
+
+    @Test
+    @DisplayName("(4) When giving an unknown name then throw a ResourceNotFoundException")
+    void whenGivingAnUnknownNameThenThrowAnException() {
+        doThrow(ResourceNotFoundException.class).when(homeApplianceRepository).findByNameIgnoreCase(badObject.getName());
+        assertThrows(ResourceNotFoundException.class, () -> homeApplianceService.findByNameIgnoreCase(badDTO.getName()));
+    }
+
+    @Test
+    @DisplayName("() When giving a bad HomeApplianceDTO object, then throw a validation exception")
     void whenGivingABadHomeApplianceDTOObjectThenThrowAnException() {
     }
 
-    @Test
-    @DisplayName("(4) When giving a name then return an Optional of HomeAppliance object")
-    void whenGivingANameThenReturnAnObjectOptional() {
-    }
-
-    @Test
-    @DisplayName("(5) When giving an unknown name then throw a ResourceNotFoundException")
-    void whenGivingAnUnknownNameThenThrowAnException() {
-    }
 }

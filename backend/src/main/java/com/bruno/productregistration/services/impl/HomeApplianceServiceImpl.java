@@ -9,6 +9,8 @@ import com.bruno.productregistration.services.exceptions.ExistingResourceExcepti
 import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +57,13 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
         HomeAppliance appliance = homeApplianceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
         return HomeApplianceDTO.builder().build().toDTO(appliance);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<HomeApplianceDTO> findAll(Pageable pageable) {
+        return homeApplianceRepository.findAll(pageable)
+                .map(element -> HomeApplianceDTO.builder().build().toDTO(element));
     }
 
     private void checkApplianceNameValidity(HomeApplianceDTO homeApplianceDTO) {

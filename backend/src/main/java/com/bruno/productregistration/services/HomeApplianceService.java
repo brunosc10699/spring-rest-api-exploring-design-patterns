@@ -1,6 +1,8 @@
 package com.bruno.productregistration.services;
 
 import com.bruno.productregistration.dto.HomeApplianceDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface HomeApplianceService {
 
@@ -9,4 +11,6 @@ public interface HomeApplianceService {
     HomeApplianceDTO findByNameIgnoreCase(String name);
 
     HomeApplianceDTO findById(String id);
+
+    Page<HomeApplianceDTO> findAll(Pageable pageable);
 }

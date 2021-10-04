@@ -12,12 +12,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -56,6 +59,8 @@ public class HomeApplianceServiceTest {
             .build();
 
     private HomeApplianceDTO badDTO = HomeApplianceDTO.builder().build().toDTO(badObject);
+
+
 
     @Test
     @DisplayName("(1) When giving a good HomeApplianceDTO object, then register a new product")
@@ -120,4 +125,29 @@ public class HomeApplianceServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> homeApplianceService.findById(badDTO.getId()));
     }
 
+    @Test
+    @DisplayName("(7) When searching for all products, then return a page of them")
+    void whenRequestingAllProductsThenReturnAPageOfThem() {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        Page<HomeAppliance> page = new PageImpl<>(Collections.singletonList(goodObject));
+        when(homeApplianceRepository.findAll(pageRequest)).thenReturn(page);
+        Page<HomeApplianceDTO> newPage = homeApplianceService.findAll(pageRequest);
+        assertAll(
+                () -> assertThat(newPage.getContent(), is(not(empty()))),
+                () -> assertThat(newPage.getTotalPages(), is(equalTo(1))),
+                () -> assertThat(newPage.getSize(), is(equalTo(1))),
+                () -> assertThat(newPage.getTotalElements(), is(equalTo(1L))),
+                () -> assertThat(newPage.getContent().get(0), is(equalTo(goodDTO)))
+        );
+    }
+
+    @Test
+    @DisplayName("(8) When searching for all products, then return an empty page")
+    void whenRequestingAllProductsThenReturnAnEmptyPage() {
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        Page<HomeAppliance> page = new PageImpl<>(Collections.emptyList());
+        when(homeApplianceRepository.findAll(pageRequest)).thenReturn(page);
+        Page<HomeApplianceDTO> newPage = homeApplianceService.findAll(pageRequest);
+        assertThat(newPage.getContent(), is(empty()));
+    }
 }

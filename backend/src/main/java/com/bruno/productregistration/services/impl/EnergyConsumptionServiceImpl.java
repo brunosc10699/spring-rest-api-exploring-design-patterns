@@ -56,6 +56,14 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
         return EnergyConsumptionDTO.toDTO(consumption);
     }
 
+    @Override
+    public EnergyConsumptionDTO update(String name, EnergyConsumptionDTO consumptionDTO) {
+        findById(name);
+        consumptionDTO.setName(name);
+        EnergyConsumption consumption = energyConsumptionRepository.save(fromDTO(consumptionDTO));
+        return EnergyConsumptionDTO.toDTO(consumption);
+    }
+
     private EnergyConsumption checkEnergyConsumptionObject(EnergyConsumption energyConsumption) {
         try {
             String name = energyConsumption.getName();
@@ -68,6 +76,16 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
             log.info("One of the energy consumption object attribute was null!");
         }
         return energyConsumption;
+    }
+
+    private EnergyConsumption fromDTO(EnergyConsumptionDTO consumptionDTO){
+        return EnergyConsumption.builder()
+                .name(consumptionDTO.getName())
+                .power(consumptionDTO.getPower())
+                .monthlyUsage(consumptionDTO.getMonthlyUsage())
+                .dailyUse(consumptionDTO.getDailyUse())
+                .monthlyConsumptionAverage(consumptionDTO.getMonthlyConsumptionAverage())
+                .build();
     }
 
 }

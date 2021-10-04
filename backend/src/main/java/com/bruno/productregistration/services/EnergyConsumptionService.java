@@ -10,4 +10,6 @@ public interface EnergyConsumptionService {
     EnergyConsumption findByNameIgnoreCase(EnergyConsumption consumption);
 
     EnergyConsumptionDTO findById(String id);
+
+    EnergyConsumptionDTO update(String name, EnergyConsumptionDTO energyConsumptionDTO);
 }

@@ -18,8 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EnergyConsumptionServiceImplTest {
@@ -93,7 +92,7 @@ public class EnergyConsumptionServiceImplTest {
     }
 
     @Test
-    @DisplayName("(6) When an object is not found by its name in the database nor the api, then return the same object")
+    @DisplayName("(6) When an object is not found by its name in the database nor in the api, then return the same object")
     void whenAnObjectIsNotFoundThenReturnTheSameObject() {
         EnergyConsumption consumption = energyConsumptionService.findByNameIgnoreCase(goodObject);
         assertAll(
@@ -103,7 +102,7 @@ public class EnergyConsumptionServiceImplTest {
     }
 
     @Test
-    @DisplayName("(7) When a valid id is given, then return an object")
+    @DisplayName("(7) When a valid id is given to find data, then return an object")
     void whenAValidIdIsGivenThenReturnAnObject() {
         when(energyConsumptionRepository.findById(goodObject.getName())).thenReturn(Optional.of(goodObject));
         EnergyConsumptionDTO consumption = energyConsumptionService.findById(goodDTO.getName());
@@ -117,9 +116,30 @@ public class EnergyConsumptionServiceImplTest {
     }
 
     @Test
-    @DisplayName("(8) When an invalid id is given, then throw a ResourceNotFoundException exception")
+    @DisplayName("(8) When an invalid id is given to find data, then throw a ResourceNotFoundException exception")
     void whenAnInvalidIdIsGivenThenThrowAnException() {
         doThrow(ResourceNotFoundException.class).when(energyConsumptionRepository).findById(badObject.getName());
         assertThrows(ResourceNotFoundException.class, () -> energyConsumptionService.findById(badDTO.getName()));
+    }
+
+    @Test
+    @DisplayName("(9) When a valid id is given to update data, then return an object")
+    void whenAValidIdIsGivenThenUpdateData() {
+        when(energyConsumptionRepository.findById(goodObject.getName())).thenReturn(Optional.of(goodObject));
+        when(energyConsumptionRepository.save(goodObject)).thenReturn(goodObject);
+        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.update(goodDTO.getName(), goodDTO);
+        assertAll(
+                () -> assertThat(consumptionDTO.getName(), is(equalTo(goodDTO.getName()))),
+                () -> assertThat(consumptionDTO.getPower(), is(equalTo(goodDTO.getPower()))),
+                () -> assertNull(consumptionDTO.getMonthlyUsage()),
+                () -> assertNull(consumptionDTO.getDailyUse()),
+                () -> assertNull(consumptionDTO.getMonthlyConsumptionAverage())
+        );
+    }
+
+    @Test
+    @DisplayName("(10) When an invalid id is given to update data, then throw a ResourceNotFoundException exception")
+    void whenAnInvalidIdIsGivenThenThrowException() {
+        assertThrows(ResourceNotFoundException.class, () -> energyConsumptionService.update(badDTO.getName(), badDTO));
     }
 }

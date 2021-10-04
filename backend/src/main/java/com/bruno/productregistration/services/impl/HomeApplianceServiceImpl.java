@@ -49,6 +49,14 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
         return HomeApplianceDTO.builder().build().toDTO(appliance);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public HomeApplianceDTO findById(String id) {
+        HomeAppliance appliance = homeApplianceRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(id));
+        return HomeApplianceDTO.builder().build().toDTO(appliance);
+    }
+
     private void checkApplianceNameValidity(HomeApplianceDTO homeApplianceDTO) {
         Optional<HomeAppliance> appliance = homeApplianceRepository.findByNameIgnoreCase(homeApplianceDTO.getName());
         if (appliance.isPresent()) throw new ExistingResourceException(homeApplianceDTO.getName());

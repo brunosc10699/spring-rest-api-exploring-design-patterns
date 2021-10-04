@@ -102,8 +102,22 @@ public class HomeApplianceServiceTest {
     }
 
     @Test
-    @DisplayName("() When giving a bad HomeApplianceDTO object, then throw a validation exception")
-    void whenGivingABadHomeApplianceDTOObjectThenThrowAnException() {
+    @DisplayName("(5) When giving a valid id, then return a HomeApplianceDTO object")
+    void whenGivingAValidIDThenReturnAHomeApplianceDTOObject() {
+        when(homeApplianceRepository.findById(goodObject.getId())).thenReturn(Optional.of(goodObject));
+        HomeApplianceDTO applianceDTO = homeApplianceService.findById(goodDTO.getId());
+        assertAll(
+                () -> assertNotNull(applianceDTO),
+                () -> assertThat(applianceDTO.getId(), is(equalTo(goodDTO.getId()))),
+                () -> assertThat(applianceDTO.getName(), is(equalTo(goodDTO.getName())))
+        );
+    }
+
+    @Test
+    @DisplayName("(6) When giving an invalid id, then throw a ResourceNotFoundException")
+    void whenGivingAnInvalidIDThenThrowAnException() {
+        doThrow(ResourceNotFoundException.class).when(homeApplianceRepository).findById(badObject.getId());
+        assertThrows(ResourceNotFoundException.class, () -> homeApplianceService.findById(badDTO.getId()));
     }
 
 }

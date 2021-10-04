@@ -31,16 +31,10 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
     public HomeApplianceDTO save(HomeApplianceDTO homeApplianceDTO) {
         checkApplianceNameValidity(homeApplianceDTO);
         setAttributeDefaultValue(homeApplianceDTO);
-        EnergyConsumption consumption = homeApplianceDTO.getEnergyConsumption();
-        try {
-            consumption = energyConsumptionService.save(consumption);
-        } catch (NullPointerException e) {
-            log.info("The EnergyConsumption object was null!");
-        }
-        homeApplianceDTO.setEnergyConsumption(consumption);
+        saveEnergyConsumption(homeApplianceDTO);
         HomeAppliance product = fromHomeApplianceDTO(homeApplianceDTO);
         product = homeApplianceRepository.save(product);
-        return HomeApplianceDTO.builder().build().toDTO(product);
+        return HomeApplianceDTO.toDTO(product);
     }
 
     @Transactional(readOnly = true)
@@ -48,7 +42,7 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
     public HomeApplianceDTO findByNameIgnoreCase(String name) {
         HomeAppliance appliance = homeApplianceRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new ResourceNotFoundException(name));
-        return HomeApplianceDTO.builder().build().toDTO(appliance);
+        return HomeApplianceDTO.toDTO(appliance);
     }
 
     @Transactional(readOnly = true)
@@ -56,14 +50,35 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
     public HomeApplianceDTO findById(String id) {
         HomeAppliance appliance = homeApplianceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
-        return HomeApplianceDTO.builder().build().toDTO(appliance);
+        return HomeApplianceDTO.toDTO(appliance);
     }
 
     @Transactional(readOnly = true)
     @Override
     public Page<HomeApplianceDTO> findAll(Pageable pageable) {
-        return homeApplianceRepository.findAll(pageable)
-                .map(element -> HomeApplianceDTO.builder().build().toDTO(element));
+        return homeApplianceRepository.findAll(pageable).map(HomeApplianceDTO::toDTO);
+    }
+
+    @Override
+    public HomeApplianceDTO update(String id, HomeApplianceDTO homeApplianceDTO) {
+        HomeApplianceDTO applianceRegistered = findById(id);
+        homeApplianceDTO.setId(id);
+        if (!homeApplianceDTO.getName().equals(applianceRegistered.getName()))
+            checkApplianceNameValidity(homeApplianceDTO);
+        saveEnergyConsumption(homeApplianceDTO);
+        HomeAppliance product = fromHomeApplianceDTO(homeApplianceDTO);
+        product = homeApplianceRepository.save(product);
+        return HomeApplianceDTO.toDTO(product);
+    }
+
+    private void saveEnergyConsumption(HomeApplianceDTO homeApplianceDTO) {
+        EnergyConsumption consumption = homeApplianceDTO.getEnergyConsumption();
+        try {
+            consumption = energyConsumptionService.save(consumption);
+        } catch (NullPointerException e) {
+            log.info("The EnergyConsumption object was null!");
+        }
+        homeApplianceDTO.setEnergyConsumption(consumption);
     }
 
     private void checkApplianceNameValidity(HomeApplianceDTO homeApplianceDTO) {
@@ -83,8 +98,7 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
         String x = uuid.substring(14, 15);
         String y = uuid.substring(19, 20);
         if (Arrays.stream(hexadecimalArray).anyMatch(element -> element.equals(x)) &&
-                Arrays.stream(alphaNumericArray).anyMatch(element -> element.equals(y)))
-            return true;
+                Arrays.stream(alphaNumericArray).anyMatch(element -> element.equals(y))) return true;
         return false;
     }
 

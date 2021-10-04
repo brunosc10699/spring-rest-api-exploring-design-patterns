@@ -13,4 +13,6 @@ public interface HomeApplianceService {
     HomeApplianceDTO findById(String id);
 
     Page<HomeApplianceDTO> findAll(Pageable pageable);
+
+    HomeApplianceDTO update(String id, HomeApplianceDTO homeApplianceDTO);
 }

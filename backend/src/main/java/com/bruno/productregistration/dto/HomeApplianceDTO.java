@@ -3,10 +3,10 @@ package com.bruno.productregistration.dto;
 import com.bruno.productregistration.entities.EnergyConsumption;
 import com.bruno.productregistration.entities.HomeAppliance;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Data
@@ -20,13 +20,13 @@ public class HomeApplianceDTO implements Serializable {
     private String id;
 
     @NotBlank(message = "This field must be filled in!")
-    @Size(min = 3, max = 100, message = "This field must have from 3 to 100 characters maximum!")
+    @Length(min = 3, max = 100, message = "This field must have from 3 to 100 characters maximum!")
     private String name;
 
     private String description;
     private Double price;
 
-    @NotNull(message = "This field must be filled in with a number!")
+//    @NotNull(message = "This field must be filled in with a number!")
     private Integer inventory;
 
     @NotNull(message = "This field must be filled in with a number!")
@@ -38,7 +38,7 @@ public class HomeApplianceDTO implements Serializable {
     private Integer classification;
     private EnergyConsumption energyConsumption;
 
-    public HomeApplianceDTO toDTO(HomeAppliance homeAppliance){
+    public static HomeApplianceDTO toDTO(HomeAppliance homeAppliance){
         return HomeApplianceDTO.builder()
                 .id(homeAppliance.getId())
                 .name(homeAppliance.getName())

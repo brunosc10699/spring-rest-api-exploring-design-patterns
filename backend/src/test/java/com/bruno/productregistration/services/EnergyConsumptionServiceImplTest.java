@@ -1,7 +1,9 @@
 package com.bruno.productregistration.services;
 
+import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import com.bruno.productregistration.entities.EnergyConsumption;
 import com.bruno.productregistration.repositories.EnergyConsumptionRepository;
+import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import com.bruno.productregistration.services.impl.EnergyConsumptionServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,11 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,9 +34,13 @@ public class EnergyConsumptionServiceImplTest {
             .name("Vacuum")
             .power(500)
             .build();
+
+    private EnergyConsumptionDTO goodDTO = EnergyConsumptionDTO.toDTO(goodObject);
     
     private EnergyConsumption badObject = EnergyConsumption.builder()
             .power(500).build();
+
+    private EnergyConsumptionDTO badDTO = EnergyConsumptionDTO.toDTO(badObject);
 
     private EnergyConsumption emptyObject = EnergyConsumption.builder().build();
 
@@ -92,5 +100,26 @@ public class EnergyConsumptionServiceImplTest {
                 () -> assertThat(consumption.getName(), is(equalTo(goodObject.getName()))),
                 () -> assertThat(consumption.getPower(), is(equalTo(goodObject.getPower())))
         );
+    }
+
+    @Test
+    @DisplayName("(7) When a valid id is given, then return an object")
+    void whenAValidIdIsGivenThenReturnAnObject() {
+        when(energyConsumptionRepository.findById(goodObject.getName())).thenReturn(Optional.of(goodObject));
+        EnergyConsumptionDTO consumption = energyConsumptionService.findById(goodDTO.getName());
+        assertAll(
+                () -> assertThat(consumption.getName(), is(equalTo(goodDTO.getName()))),
+                () -> assertThat(consumption.getPower(), is(equalTo(goodDTO.getPower()))),
+                () -> assertNull(consumption.getMonthlyUsage()),
+                () -> assertNull(consumption.getDailyUse()),
+                () -> assertNull(consumption.getMonthlyConsumptionAverage())
+        );
+    }
+
+    @Test
+    @DisplayName("(8) When an invalid id is given, then throw a ResourceNotFoundException exception")
+    void whenAnInvalidIdIsGivenThenThrowAnException() {
+        doThrow(ResourceNotFoundException.class).when(energyConsumptionRepository).findById(badObject.getName());
+        assertThrows(ResourceNotFoundException.class, () -> energyConsumptionService.findById(badDTO.getName()));
     }
 }

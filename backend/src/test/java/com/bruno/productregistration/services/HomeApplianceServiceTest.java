@@ -34,8 +34,10 @@ public class HomeApplianceServiceTest {
     @InjectMocks
     private HomeApplianceServiceImpl homeApplianceService;
 
+    private String id = "0bd985cd-bc4e-484e-ab9d-721f63d7c908";
+
     private HomeAppliance goodObject = HomeAppliance.builder()
-            .id("0bd985cd-bc4e-484e-ab9d-721f63d7c908")
+            .id(id)
             .name("Vacuum")
             .description(null)
             .price(0.0)
@@ -49,7 +51,7 @@ public class HomeApplianceServiceTest {
     private HomeApplianceDTO goodDTO = HomeApplianceDTO.builder().build().toDTO(goodObject);
 
     private HomeAppliance badObject = HomeAppliance.builder()
-            .id("0bd985cd-bc4e-484e-ab9d-721f63d7c908")
+            .id(id)
             .name("Va")
             .price(0.0)
             .inventory(0)
@@ -59,8 +61,6 @@ public class HomeApplianceServiceTest {
             .build();
 
     private HomeApplianceDTO badDTO = HomeApplianceDTO.builder().build().toDTO(badObject);
-
-
 
     @Test
     @DisplayName("(1) When giving a good HomeApplianceDTO object, then register a new product")
@@ -149,5 +149,41 @@ public class HomeApplianceServiceTest {
         when(homeApplianceRepository.findAll(pageRequest)).thenReturn(page);
         Page<HomeApplianceDTO> newPage = homeApplianceService.findAll(pageRequest);
         assertThat(newPage.getContent(), is(empty()));
+    }
+
+    @Test
+    @DisplayName("(9) Must update the home appliance registration by its id")
+    void whenUpdateByIdIsCalledThenReturnTheUpdatedObject() {
+        when(homeApplianceRepository.findById(id)).thenReturn(Optional.of(goodObject));
+        when(homeApplianceRepository.save(goodObject)).thenReturn(goodObject);
+        HomeApplianceDTO applianceDTO = homeApplianceService.update(goodDTO.getId(), goodDTO);
+        assertAll(
+                () -> assertThat(applianceDTO.getId(), is(equalTo(goodDTO.getId()))),
+                () -> assertNotNull(applianceDTO.getName()),
+                () -> assertNotNull(applianceDTO.getPortable()),
+                () -> assertNotNull(applianceDTO.getVoltage()),
+                () -> assertThat(applianceDTO.getName(), is(equalTo(goodDTO.getName()))),
+                () -> assertThat(applianceDTO.getDescription(), is(equalTo(goodDTO.getDescription()))),
+                () -> assertThat(applianceDTO.getPrice(), is(equalTo(goodDTO.getPrice()))),
+                () -> assertThat(applianceDTO.getInventory(), is(equalTo(goodDTO.getInventory()))),
+                () -> assertThat(applianceDTO.getPortable(), is(equalTo(goodDTO.getPortable()))),
+                () -> assertThat(applianceDTO.getVoltage(), is(equalTo(goodDTO.getVoltage()))),
+                () -> assertThat(applianceDTO.getClassification(), is(equalTo(goodDTO.getClassification()))),
+                () -> assertThat(applianceDTO.getEnergyConsumption(), is(equalTo(goodDTO.getEnergyConsumption())))
+        );
+    }
+
+    @Test
+    @DisplayName("(10) When an invalid id is giving to update an appliance, then throw a ResourceNotFoundException exception")
+    void whenGivingAnInvalidIdThenThrowException() {
+        doThrow(ResourceNotFoundException.class).when(homeApplianceRepository).findById(badDTO.getId());
+        assertThrows(ResourceNotFoundException.class, () -> homeApplianceService.findById(badDTO.getId()));
+    }
+
+    @Test
+    @DisplayName("(11) When an existent name is giving to update an appliance, then throw a ExistingResourceException exception")
+    void whenGivingAnInvalidNameThenThrowException() {
+        doThrow(ExistingResourceException.class).when(homeApplianceRepository).findByNameIgnoreCase(badDTO.getName());
+        assertThrows(ExistingResourceException.class, () -> homeApplianceService.findByNameIgnoreCase(badDTO.getName()));
     }
 }

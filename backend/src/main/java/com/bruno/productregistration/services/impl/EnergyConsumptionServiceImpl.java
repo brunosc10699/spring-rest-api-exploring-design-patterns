@@ -1,9 +1,11 @@
 package com.bruno.productregistration.services.impl;
 
+import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import com.bruno.productregistration.entities.EnergyConsumption;
 import com.bruno.productregistration.repositories.EnergyConsumptionRepository;
 import com.bruno.productregistration.services.EnergyConsumptionAPIService;
 import com.bruno.productregistration.services.EnergyConsumptionService;
+import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -45,6 +47,13 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
                     }
                     return consumption;
                 });
+    }
+
+    @Override
+    public EnergyConsumptionDTO findById(String id) {
+        EnergyConsumption consumption = energyConsumptionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(id));
+        return EnergyConsumptionDTO.toDTO(consumption);
     }
 
     private EnergyConsumption checkEnergyConsumptionObject(EnergyConsumption energyConsumption) {

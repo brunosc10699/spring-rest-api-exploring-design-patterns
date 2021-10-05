@@ -10,11 +10,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+
+import java.util.Collections;
 
 import static com.bruno.productregistration.resources.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
@@ -97,5 +103,16 @@ public class HomeApplianceResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(badDTO)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("(3) When GET is called to retrieve all elements, then OK status is returned")
+    void whenGETIsCalledToRetrieveAllElementsThenReturnOkStatus() throws Exception {
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        Page<HomeApplianceDTO> page = new PageImpl<>(Collections.singletonList(goodDTO));
+        when(homeApplianceService.findAll(pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

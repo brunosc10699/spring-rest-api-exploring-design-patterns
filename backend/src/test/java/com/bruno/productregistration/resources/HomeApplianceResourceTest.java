@@ -38,7 +38,7 @@ public class HomeApplianceResourceTest {
 
     private String id = "0bd985cd-bc4e-484e-ab9d-721f63d7c908";
 
-    private HomeAppliance goodObject = HomeAppliance.builder()
+    private HomeApplianceDTO goodDTO = HomeApplianceDTO.builder()
             .id(id)
             .name("Vacuum")
             .description(null)
@@ -50,9 +50,7 @@ public class HomeApplianceResourceTest {
             .energyConsumption(null)
             .build();
 
-    private HomeApplianceDTO goodDTO = HomeApplianceDTO.toDTO(goodObject);
-
-    private HomeAppliance badObject = HomeAppliance.builder()
+    private HomeApplianceDTO badDTO = HomeApplianceDTO.builder()
             .id(id)
             .name("Va")
             .price(0.0)
@@ -61,8 +59,6 @@ public class HomeApplianceResourceTest {
             .classification(3)
             .voltage(0)
             .build();
-
-    private HomeApplianceDTO badDTO = HomeApplianceDTO.toDTO(badObject);
 
     @Mock
     private HomeApplianceServiceImpl homeApplianceService;
@@ -137,10 +133,38 @@ public class HomeApplianceResourceTest {
     }
 
     @Test
-    @DisplayName("(2) When GET is called with an invalid id, then return a 404 not found status")
+    @DisplayName("(5) When GET is called with an invalid id, then return a 404 not found status")
     void whenGETIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception{
         doThrow(ResourceNotFoundException.class).when(homeApplianceService).findById(badDTO.getId());
         mockMvc.perform(MockMvcRequestBuilders.get(URN + badDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("(6) When GET is called to find a product by its name, then return 200 Ok status")
+    void whenGETIsCalledToFindAProductByItsNameThenReturnOkStatus() throws Exception {
+        when(homeApplianceService.findByNameIgnoreCase(goodDTO.getName())).thenReturn(goodDTO);
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/name/" + goodDTO.getName())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(goodDTO.getId())))
+                .andExpect(jsonPath("$.name", is(goodDTO.getName())))
+                .andExpect(jsonPath("$.description", is(goodDTO.getDescription())))
+                .andExpect(jsonPath("$.price", is(goodDTO.getPrice())))
+                .andExpect(jsonPath("$.inventory", is(goodDTO.getInventory())))
+                .andExpect(jsonPath("$.voltage", is(goodDTO.getVoltage())))
+                .andExpect(jsonPath("$.portable", is(goodDTO.getPortable())))
+                .andExpect(jsonPath("$.classification", is(goodDTO.getClassification())))
+                .andExpect(jsonPath("$.energyConsumption", is(goodDTO.getEnergyConsumption())));
+    }
+
+    @Test
+    @DisplayName("(7) When GET is called to find a product with an invalid name, " +
+            "then return 404 not found status")
+    void whenGETIsCalledToFindAProductWithAnInvalidNameThenReturnNotFoundStatus() throws Exception {
+        doThrow(ResourceNotFoundException.class).when(homeApplianceService).findByNameIgnoreCase(badDTO.getName());
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/name/" + badDTO.getName())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

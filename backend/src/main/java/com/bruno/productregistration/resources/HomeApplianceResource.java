@@ -38,4 +38,9 @@ public class HomeApplianceResource {
     public ResponseEntity<HomeApplianceDTO> findById(@PathVariable String id){
         return ResponseEntity.ok(homeApplianceService.findById(id));
     }
+
+    @GetMapping(value = "/name/{name}")
+    public ResponseEntity<HomeApplianceDTO> findByNameIgnoreCase(@PathVariable String name){
+        return ResponseEntity.ok(homeApplianceService.findByNameIgnoreCase(name));
+    }
 }

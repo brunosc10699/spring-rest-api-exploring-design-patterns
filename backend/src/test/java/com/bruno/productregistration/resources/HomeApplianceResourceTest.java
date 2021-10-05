@@ -2,6 +2,7 @@ package com.bruno.productregistration.resources;
 
 import com.bruno.productregistration.dto.HomeApplianceDTO;
 import com.bruno.productregistration.entities.HomeAppliance;
+import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import com.bruno.productregistration.services.impl.HomeApplianceServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +25,7 @@ import java.util.Collections;
 
 import static com.bruno.productregistration.resources.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -97,7 +99,7 @@ public class HomeApplianceResourceTest {
     }
 
     @Test
-    @DisplayName("(2) When POST is called without required fields, then return an error")
+    @DisplayName("(2) When POST is called without required fields, then return a 400 bad request status")
     void whenPOSTIsCalledWithoutRequiredFieldsThenReturnAnError() throws Exception {
         mockMvc.perform(post(URN)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -106,13 +108,40 @@ public class HomeApplianceResourceTest {
     }
 
     @Test
-    @DisplayName("(3) When GET is called to retrieve all elements, then OK status is returned")
-    void whenGETIsCalledToRetrieveAllElementsThenReturnOkStatus() throws Exception {
+    @DisplayName("(3) When GET is called to retrieve all appliances, then OK status is returned")
+    void whenGETIsCalledToRetrieveAllAppliancesThenReturnOkStatus() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 20);
         Page<HomeApplianceDTO> page = new PageImpl<>(Collections.singletonList(goodDTO));
         when(homeApplianceService.findAll(pageRequest)).thenReturn(page);
         mockMvc.perform(MockMvcRequestBuilders.get(URN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("(4) When GET is called to find a product by id, then OK status is returned")
+    void whenGETIsCalledToFindAProductByIdThenReturnOkStatus() throws Exception {
+        when(homeApplianceService.findById(goodDTO.getId())).thenReturn(goodDTO);
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + goodDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(goodDTO.getId())))
+                .andExpect(jsonPath("$.name", is(goodDTO.getName())))
+                .andExpect(jsonPath("$.description", is(goodDTO.getDescription())))
+                .andExpect(jsonPath("$.price", is(goodDTO.getPrice())))
+                .andExpect(jsonPath("$.inventory", is(goodDTO.getInventory())))
+                .andExpect(jsonPath("$.voltage", is(goodDTO.getVoltage())))
+                .andExpect(jsonPath("$.portable", is(goodDTO.getPortable())))
+                .andExpect(jsonPath("$.classification", is(goodDTO.getClassification())))
+                .andExpect(jsonPath("$.energyConsumption", is(goodDTO.getEnergyConsumption())));
+    }
+
+    @Test
+    @DisplayName("(2) When GET is called with an invalid id, then return a 404 not found status")
+    void whenGETIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception{
+        doThrow(ResourceNotFoundException.class).when(homeApplianceService).findById(badDTO.getId());
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + badDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

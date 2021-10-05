@@ -48,4 +48,10 @@ public class HomeApplianceResource {
     public ResponseEntity<HomeApplianceDTO> update(@PathVariable String id, @Valid @RequestBody HomeApplianceDTO homeApplianceDTO){
         return ResponseEntity.ok(homeApplianceService.update(id, homeApplianceDTO));
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id){
+        homeApplianceService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

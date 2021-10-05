@@ -25,8 +25,7 @@ import java.util.Collections;
 
 import static com.bruno.productregistration.resources.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -207,5 +206,23 @@ public class HomeApplianceResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(badDTO)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("(11) When DELETE is called with a valid id, then return 204 no content status")
+    void whenDELETEIsCalledWithAValidIdThenReturnNoContentStatus() throws Exception {
+        doNothing().when(homeApplianceService).delete(goodDTO.getId());
+        mockMvc.perform(MockMvcRequestBuilders.delete(URN + goodDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("(12) When DELETE is called with an invalid id, then return 404 not found status")
+    void whenDELETEIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception {
+        doThrow(ResourceNotFoundException.class).when(homeApplianceService).delete(badDTO.getId());
+        mockMvc.perform(MockMvcRequestBuilders.delete(URN + badDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

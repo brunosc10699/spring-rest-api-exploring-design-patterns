@@ -43,4 +43,9 @@ public class HomeApplianceResource {
     public ResponseEntity<HomeApplianceDTO> findByNameIgnoreCase(@PathVariable String name){
         return ResponseEntity.ok(homeApplianceService.findByNameIgnoreCase(name));
     }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<HomeApplianceDTO> update(@PathVariable String id, @Valid @RequestBody HomeApplianceDTO homeApplianceDTO){
+        return ResponseEntity.ok(homeApplianceService.update(id, homeApplianceDTO));
+    }
 }

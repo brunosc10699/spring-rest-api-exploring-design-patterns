@@ -168,4 +168,44 @@ public class HomeApplianceResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @DisplayName("(8) When PUT is called to update a product with a valid id, then return 200 Ok status")
+    void whenPUTIsCalledToUpdateAProductThenReturnOkStatus() throws Exception {
+        when(homeApplianceService.update(goodDTO.getId(), goodDTO)).thenReturn(goodDTO);
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + goodDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(goodDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(goodDTO.getId())))
+                .andExpect(jsonPath("$.name", is(goodDTO.getName())))
+                .andExpect(jsonPath("$.description", is(goodDTO.getDescription())))
+                .andExpect(jsonPath("$.price", is(goodDTO.getPrice())))
+                .andExpect(jsonPath("$.inventory", is(goodDTO.getInventory())))
+                .andExpect(jsonPath("$.voltage", is(goodDTO.getVoltage())))
+                .andExpect(jsonPath("$.portable", is(goodDTO.getPortable())))
+                .andExpect(jsonPath("$.classification", is(goodDTO.getClassification())))
+                .andExpect(jsonPath("$.energyConsumption", is(goodDTO.getEnergyConsumption())));
+    }
+
+    @Test
+    @DisplayName("(9) When PUT is called to update a product with an invalid id, " +
+            "then return 404 not found status")
+    void whenPUTIsCalledToUpdateAProductThenReturnNotFoundStatus() throws Exception {
+        doThrow(ResourceNotFoundException.class).when(homeApplianceService).update(goodDTO.getId(), goodDTO);
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + goodDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(goodDTO)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("(10) When PUT is called to update a product with an invalid payload, " +
+            "then return 400 bad request status")
+    void whenPUTIsCalledToUpdateAProductThenReturnBadRequestStatus() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + badDTO.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(badDTO)))
+                .andExpect(status().isBadRequest());
+    }
 }

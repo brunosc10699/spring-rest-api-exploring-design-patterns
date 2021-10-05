@@ -39,4 +39,9 @@ public class EnergyConsumptionResource {
         return ResponseEntity.ok(energyConsumptionService.findById(id));
     }
 
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<EnergyConsumptionDTO> update(@PathVariable String id, @Valid @RequestBody EnergyConsumptionDTO consumptionDTO){
+        return ResponseEntity.ok(energyConsumptionService.update(id, consumptionDTO));
+    }
+
 }

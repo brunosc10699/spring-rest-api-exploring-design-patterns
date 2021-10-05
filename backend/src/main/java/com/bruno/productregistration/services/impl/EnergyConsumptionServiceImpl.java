@@ -82,7 +82,6 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
 
     private EnergyConsumptionDTO checkEnergyConsumptionObject(EnergyConsumptionDTO consumptionDTO) {
         try {
-//            String name = consumptionDTO.getName();
             if (consumptionDTO.getName().length() > 2) {
                 Integer power = consumptionDTO.getPower();
                 EnergyConsumptionDTO consumption = findByNameIgnoreCase(consumptionDTO);

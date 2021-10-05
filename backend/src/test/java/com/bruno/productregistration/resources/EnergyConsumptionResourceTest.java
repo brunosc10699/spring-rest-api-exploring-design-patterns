@@ -35,8 +35,6 @@ public class EnergyConsumptionResourceTest {
 
     private static final String URN = "/api/v1/consumptions/";
 
-    private String id = "0bd985cd-bc4e-484e-ab9d-721f63d7c908";
-
     private EnergyConsumptionDTO goodDTO = EnergyConsumptionDTO.builder()
             .name("Vacuum")
             .power(200)
@@ -113,6 +111,7 @@ public class EnergyConsumptionResourceTest {
                 .andExpect(jsonPath("$.dailyUse", is(goodDTO.getDailyUse())))
                 .andExpect(jsonPath("$.monthlyConsumptionAverage", is(goodDTO.getMonthlyConsumptionAverage())));
     }
+
     @Test
     @DisplayName("(5) When GET is called to find energy consumption data by an invalid id then return 404 Not Found Status")
     void whenGETIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception {
@@ -121,4 +120,31 @@ public class EnergyConsumptionResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    @DisplayName("(6) When PUT is called to update energy consumption data by a valid id then return 200 Ok status")
+    void whenPUTIsCalledToUpdateEnergyConsumptionDataWithAValidIdThenReturnOkStatus() throws Exception {
+        when(energyConsumptionService.update(goodDTO.getName(), goodDTO)).thenReturn(goodDTO);
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + goodDTO.getName())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(goodDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(goodDTO.getName())))
+                .andExpect(jsonPath("$.power", is(goodDTO.getPower())))
+                .andExpect(jsonPath("$.monthlyUsage", is(goodDTO.getMonthlyUsage())))
+                .andExpect(jsonPath("$.dailyUse", is(goodDTO.getDailyUse())))
+                .andExpect(jsonPath("$.monthlyConsumptionAverage", is(goodDTO.getMonthlyConsumptionAverage())));
+    }
+
+    @Test
+    @DisplayName("(7) When PUT is called to update energy consumption data by an invalid id then return 404 Not Found status")
+    void whenPUTIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception {
+        doThrow(ResourceNotFoundException.class).when(energyConsumptionService).update(goodDTO.getName(), goodDTO);
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + goodDTO.getName())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(goodDTO)))
+                .andExpect(status().isNotFound());
+    }
+
+
 }

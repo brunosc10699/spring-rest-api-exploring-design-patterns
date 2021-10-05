@@ -2,7 +2,6 @@ package com.bruno.productregistration.resources;
 
 import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import com.bruno.productregistration.services.EnergyConsumptionService;
-import com.bruno.productregistration.services.exceptions.ExistingResourceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,15 +9,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import java.util.Collections;
+
 import static com.bruno.productregistration.resources.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -81,5 +85,16 @@ public class EnergyConsumptionResourceTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(badDTO)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("(3) When GET is called to find all energy consumption data then return 200 ok status")
+    void whenGETIsCalledToFindAllEnergyConsumptionDataThenReturnOkStatus() throws Exception {
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        Page<EnergyConsumptionDTO> page = new PageImpl(Collections.singletonList(goodDTO));
+        when(energyConsumptionService.findAll(pageRequest)).thenReturn(page);
+        mockMvc.perform(MockMvcRequestBuilders.get(URN)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

@@ -47,7 +47,7 @@ public class HomeApplianceServiceTest {
             .energyConsumption(null)
             .build();
 
-    private HomeApplianceDTO goodDTO = HomeApplianceDTO.builder().build().toDTO(goodObject);
+    private HomeApplianceDTO goodDTO = HomeApplianceDTO.toDTO(goodObject);
 
     private HomeAppliance badObject = HomeAppliance.builder()
             .id(id)
@@ -59,7 +59,7 @@ public class HomeApplianceServiceTest {
             .voltage(0)
             .build();
 
-    private HomeApplianceDTO badDTO = HomeApplianceDTO.builder().build().toDTO(badObject);
+    private HomeApplianceDTO badDTO = HomeApplianceDTO.toDTO(badObject);
 
     @Test
     @DisplayName("(1) When given a good HomeApplianceDTO object, then register a new product")

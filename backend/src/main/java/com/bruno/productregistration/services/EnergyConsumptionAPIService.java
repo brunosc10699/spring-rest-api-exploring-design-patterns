@@ -1,6 +1,6 @@
 package com.bruno.productregistration.services;
 
-import com.bruno.productregistration.entities.EnergyConsumption;
+import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface EnergyConsumptionAPIService {
 
     @GetMapping(value = "/name")
-    EnergyConsumption getConsumption(@RequestParam("name") String name);
+    EnergyConsumptionDTO getConsumption(@RequestParam("name") String name);
 }

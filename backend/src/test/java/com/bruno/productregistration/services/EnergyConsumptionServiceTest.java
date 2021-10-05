@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -40,67 +41,93 @@ public class EnergyConsumptionServiceTest {
     private EnergyConsumptionDTO goodDTO = EnergyConsumptionDTO.toDTO(goodObject);
     
     private EnergyConsumption badObject = EnergyConsumption.builder()
-            .power(500).build();
+            .name("Va")
+            .power(500)
+            .build();
 
     private EnergyConsumptionDTO badDTO = EnergyConsumptionDTO.toDTO(badObject);
 
     private EnergyConsumption emptyObject = EnergyConsumption.builder().build();
+
+    private EnergyConsumptionDTO emptyDTO = EnergyConsumptionDTO.toDTO(emptyObject);
 
     @Test
     @DisplayName("(1) When an object that contains a name and a power attribute is given" +
             "then it should be registered")
     void whenAnObjectIsGivenThenRegisterTheObject() {
         when(energyConsumptionRepository.save(goodObject)).thenReturn(goodObject);
-        EnergyConsumption consumption = energyConsumptionService.save(goodObject);
+        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.save(goodDTO);
         assertAll(
-                () -> assertThat(consumption.getName(), is(equalTo(goodObject.getName()))),
-                () -> assertThat(consumption.getPower(), is(equalTo(goodObject.getPower()))),
-                () -> assertNull(consumption.getMonthlyUsage()),
-                () -> assertNull(consumption.getDailyUse()),
-                () -> assertNull(consumption.getMonthlyConsumptionAverage())
+                () -> assertThat(consumptionDTO.getName(), is(equalTo(goodDTO.getName()))),
+                () -> assertThat(consumptionDTO.getPower(), is(equalTo(goodDTO.getPower()))),
+                () -> assertNull(consumptionDTO.getMonthlyUsage()),
+                () -> assertNull(consumptionDTO.getDailyUse()),
+                () -> assertNull(consumptionDTO.getMonthlyConsumptionAverage())
         );
     }
 
     @Test
     @DisplayName("(2) When an object doesn't contain a name and a power attribute" +
-            "then don't register it. Return a null object.")
-    void whenAnObjectDoesNotHaveNameAndPowerAttributeThenDoNotRegisterIt() {
-        EnergyConsumption consumption = energyConsumptionService.save(badObject);
-        assertNull(consumption);
+            "then don't register it.")
+    void whenAnObjectDoesNotHaveANameAndAPowerAttributeThenDoNotRegisterIt() {
+        EnergyConsumption incompleteObject = EnergyConsumption.builder().monthlyUsage(4).build();
+        when(energyConsumptionRepository.save(incompleteObject)).thenReturn(emptyObject);
+        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.save(emptyDTO);
+        assertAll(
+                () -> assertNull(consumptionDTO.getName()),
+                () -> assertNull(consumptionDTO.getPower()),
+                () -> assertNull(consumptionDTO.getMonthlyUsage()),
+                () -> assertNull(consumptionDTO.getDailyUse()),
+                () -> assertNull(consumptionDTO.getMonthlyConsumptionAverage())
+        );
     }
 
     @Test
     @DisplayName("(3) When an empty object is given then don't register it. Return a null object.")
     void whenAnEmptyObjectIsGivenThenDoNotRegisterIt() {
-        EnergyConsumption consumption = energyConsumptionService.save(emptyObject);
-        assertNull(consumption);
+        when(energyConsumptionRepository.save(emptyObject)).thenReturn(emptyObject);
+        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.save(emptyDTO);
+        assertAll(
+                () -> assertNull(consumptionDTO.getName()),
+                () -> assertNull(consumptionDTO.getPower()),
+                () -> assertNull(consumptionDTO.getMonthlyUsage()),
+                () -> assertNull(consumptionDTO.getDailyUse()),
+                () -> assertNull(consumptionDTO.getMonthlyConsumptionAverage())
+        );
     }
 
     @Test
-    @DisplayName("(4) When the name attribute length is less than 3 characters," +
-            "then don't register it. Return a null object.")
+    @DisplayName("(4) When the name's attribute length is less than 3 characters," +
+            "then don't register it. Return the same object.")
     void whenNameAttributeLengthIsLessThanThreeCharactersThenDoNotRegisterIt() {
-        EnergyConsumption consumption = energyConsumptionService.save(emptyObject);
-        assertNull(consumption);
+//        when(energyConsumptionRepository.save(badObject)).thenReturn(badObject);
+        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.save(badDTO);
+        assertAll(
+                () -> assertNull(consumptionDTO.getName()),
+                () -> assertNull(consumptionDTO.getPower()),
+                () -> assertNull(consumptionDTO.getMonthlyUsage()),
+                () -> assertNull(consumptionDTO.getDailyUse()),
+                () -> assertNull(consumptionDTO.getMonthlyConsumptionAverage())
+        );
     }
 
     @Test
     @DisplayName("(5) When a name is given then return an object of EnergyConsumption")
     void whenANameIsGivenThenReturnAnOptionalObject() {
-        EnergyConsumption consumption = energyConsumptionService.findByNameIgnoreCase(goodObject);
+        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.findByNameIgnoreCase(goodDTO);
         assertAll(
-                () -> assertThat(consumption.getName(), is(equalTo(goodObject.getName()))),
-                () -> assertThat(consumption.getPower(), is(equalTo(goodObject.getPower())))
+                () -> assertThat(consumptionDTO.getName(), is(equalTo(goodObject.getName()))),
+                () -> assertThat(consumptionDTO.getPower(), is(equalTo(goodObject.getPower())))
         );
     }
 
     @Test
     @DisplayName("(6) When an object is not found by its name in the database nor in the api, then return the same object")
     void whenAnObjectIsNotFoundThenReturnTheSameObject() {
-        EnergyConsumption consumption = energyConsumptionService.findByNameIgnoreCase(goodObject);
+        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.findByNameIgnoreCase(goodDTO);
         assertAll(
-                () -> assertThat(consumption.getName(), is(equalTo(goodObject.getName()))),
-                () -> assertThat(consumption.getPower(), is(equalTo(goodObject.getPower())))
+                () -> assertThat(consumptionDTO.getName(), is(equalTo(goodObject.getName()))),
+                () -> assertThat(consumptionDTO.getPower(), is(equalTo(goodObject.getPower())))
         );
     }
 

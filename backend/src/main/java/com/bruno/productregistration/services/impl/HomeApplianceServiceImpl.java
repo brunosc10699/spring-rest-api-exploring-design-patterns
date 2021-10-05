@@ -1,5 +1,6 @@
 package com.bruno.productregistration.services.impl;
 
+import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import com.bruno.productregistration.dto.HomeApplianceDTO;
 import com.bruno.productregistration.entities.EnergyConsumption;
 import com.bruno.productregistration.entities.HomeAppliance;
@@ -80,7 +81,15 @@ public class HomeApplianceServiceImpl implements HomeApplianceService {
     private void saveEnergyConsumption(HomeApplianceDTO homeApplianceDTO) {
         EnergyConsumption consumption = homeApplianceDTO.getEnergyConsumption();
         try {
-            consumption = energyConsumptionService.save(consumption);
+            EnergyConsumptionDTO consumptionDTO = EnergyConsumptionDTO.toDTO(consumption);
+            consumptionDTO = energyConsumptionService.save(consumptionDTO);
+            consumption = EnergyConsumption.builder()
+                    .name(consumptionDTO.getName())
+                    .power(consumptionDTO.getPower())
+                    .monthlyUsage(consumptionDTO.getMonthlyUsage())
+                    .dailyUse(consumptionDTO.getDailyUse())
+                    .monthlyConsumptionAverage(consumptionDTO.getMonthlyConsumptionAverage())
+                    .build();
         } catch (NullPointerException e) {
             log.info("The EnergyConsumption object was null!");
         }

@@ -1,5 +1,6 @@
 package com.bruno.productregistration.config;
 
+import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import com.bruno.productregistration.entities.EnergyConsumption;
 import com.bruno.productregistration.entities.HomeAppliance;
 import com.bruno.productregistration.repositories.EnergyConsumptionRepository;
@@ -28,9 +29,15 @@ public class DummyData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (activeProfile != "prod") {
-            EnergyConsumption energyConsumption = energyConsumptionAPIService.getConsumption("Enceradeira");
-            energyConsumptionRepository.save(energyConsumption);
+        if (!activeProfile.equals("prod")) {
+            EnergyConsumption consumption = EnergyConsumption.builder()
+                    .name("Enceradeira")
+                    .power(180)
+                    .monthlyUsage(4)
+                    .dailyUse(120)
+                    .monthlyConsumptionAverage(16.5)
+                    .build();
+            energyConsumptionRepository.save(consumption);
 
             HomeAppliance homeAppliance = HomeAppliance.builder()
                     .id(UUID.randomUUID().toString())
@@ -41,7 +48,7 @@ public class DummyData implements CommandLineRunner {
                     .voltage(0)
                     .portable(true)
                     .classification(2)
-                    .energyConsumption(energyConsumption)
+                    .energyConsumption(consumption)
                     .build();
             homeApplianceRepository.save(homeAppliance);
         }

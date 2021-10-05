@@ -24,14 +24,17 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
     private final EnergyConsumptionAPIService energyConsumptionAPIService;
 
     @Override
-    public EnergyConsumption save(EnergyConsumption consumption) {
-        consumption = checkEnergyConsumptionObject(consumption);
+    public EnergyConsumptionDTO save(EnergyConsumptionDTO consumptionDTO) {
+        consumptionDTO = checkEnergyConsumptionObject(consumptionDTO);
         try {
-            if (!consumption.equals(null)) return energyConsumptionRepository.save(consumption);
+            if (consumptionDTO != null) {
+                EnergyConsumption consumption = energyConsumptionRepository.save(fromDTO(consumptionDTO));
+                return EnergyConsumptionDTO.toDTO(consumption);
+            }
         } catch (NullPointerException e) {
             log.info("The EnergyConsumption object was null!");
         }
-        return consumption;
+        return consumptionDTO;
     }
 
     @Override
@@ -41,18 +44,18 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
 
     @Transactional(readOnly = true)
     @Override
-    public EnergyConsumption findByNameIgnoreCase(EnergyConsumption consumption) {
-        return energyConsumptionRepository.findByNameIgnoreCase(consumption.getName())
+    public EnergyConsumptionDTO findByNameIgnoreCase(EnergyConsumptionDTO consumptionDTO) {
+        return energyConsumptionRepository.findByNameIgnoreCase(consumptionDTO.getName())
                 .orElseGet(() -> {
                     try {
-                        EnergyConsumption newConsumption = energyConsumptionAPIService.getConsumption(consumption.getName());
+                        EnergyConsumptionDTO newConsumption = energyConsumptionAPIService.getConsumption(consumptionDTO.getName());
                         return newConsumption;
                     } catch (FeignException e) {
-                        log.info("Energy consumption information about " + consumption.getName() + " was not found!");
+                        log.info("Energy consumptionDTO information about " + consumptionDTO.getName() + " was not found!");
                     } catch (NullPointerException e) {
                         log.info(e.getLocalizedMessage());
                     }
-                    return consumption;
+                    return consumptionDTO;
                 });
     }
 
@@ -77,18 +80,18 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
         energyConsumptionRepository.deleteById(name);
     }
 
-    private EnergyConsumption checkEnergyConsumptionObject(EnergyConsumption energyConsumption) {
+    private EnergyConsumptionDTO checkEnergyConsumptionObject(EnergyConsumptionDTO consumptionDTO) {
         try {
-            String name = energyConsumption.getName();
-            if (name.length() > 2) {
-                Integer power = energyConsumption.getPower();
-                EnergyConsumption consumption = findByNameIgnoreCase(energyConsumption);
+//            String name = consumptionDTO.getName();
+            if (consumptionDTO.getName().length() > 2) {
+                Integer power = consumptionDTO.getPower();
+                EnergyConsumptionDTO consumption = findByNameIgnoreCase(consumptionDTO);
                 return consumption;
             }
         } catch (NullPointerException e) {
             log.info("One of the energy consumption object attribute was null!");
         }
-        return energyConsumption;
+        return EnergyConsumptionDTO.builder().build();
     }
 
     private EnergyConsumption fromDTO(EnergyConsumptionDTO consumptionDTO){

@@ -7,11 +7,11 @@ import org.springframework.data.domain.Pageable;
 
 public interface EnergyConsumptionService {
 
-    EnergyConsumption save(EnergyConsumption consumption);
+    EnergyConsumptionDTO save(EnergyConsumptionDTO consumptionDTO);
 
     Page<EnergyConsumptionDTO> findAll(Pageable pageable);
 
-    EnergyConsumption findByNameIgnoreCase(EnergyConsumption consumption);
+    EnergyConsumptionDTO findByNameIgnoreCase(EnergyConsumptionDTO consumptionDTO);
 
     EnergyConsumptionDTO findById(String id);
 

@@ -11,17 +11,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EnergyConsumptionServiceImplTest {
+public class EnergyConsumptionServiceTest {
 
     @Mock
     private EnergyConsumptionRepository energyConsumptionRepository;
@@ -157,5 +160,31 @@ public class EnergyConsumptionServiceImplTest {
     @DisplayName("(12) When an invalid id is given to delete data, then throw a ResourceNotFoundException exception")
     void whenAnInvalidIdIsGivenToDeleteThenThrowException() {
         assertThrows(ResourceNotFoundException.class, () -> energyConsumptionService.delete(badDTO.getName()));
+    }
+
+    @Test
+    @DisplayName("(13) When searching for all energy consumption data, then return a page")
+    void whenFindAllServiceMethodIsCalledThenReturnAPage() {
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        Page page = new PageImpl(Collections.singletonList(goodObject));
+        when(energyConsumptionRepository.findAll(pageRequest)).thenReturn(page);
+        Page<EnergyConsumptionDTO> newPage = energyConsumptionService.findAll(pageRequest);
+        assertAll(
+                () -> assertThat(newPage.getContent(), is(not(empty()))),
+                () -> assertThat(newPage.getTotalElements(), is(equalTo(1L))),
+                () -> assertThat(newPage.getTotalPages(), is(equalTo(1))),
+                () -> assertThat(newPage.getSize(), is(equalTo(1))),
+                () -> assertThat(newPage.getContent().get(0), is(equalTo(goodDTO)))
+        );
+    }
+
+    @Test
+    @DisplayName("(14) When searching for all energy consumption data, then return an empty page")
+    void whenFindAllServiceMethodIsCalledThenReturnAnEmptyPage() {
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        Page page = new PageImpl(Collections.emptyList());
+        when(energyConsumptionRepository.findAll(pageRequest)).thenReturn(page);
+        Page<EnergyConsumptionDTO> newPage = energyConsumptionService.findAll(pageRequest);
+        assertThat(newPage.getContent(), is(empty()));
     }
 }

@@ -9,6 +9,8 @@ import com.bruno.productregistration.services.exceptions.ResourceNotFoundExcepti
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,11 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
             log.info("The EnergyConsumption object was null!");
         }
         return consumption;
+    }
+
+    @Override
+    public Page<EnergyConsumptionDTO> findAll(Pageable pageable) {
+        return energyConsumptionRepository.findAll(pageable).map(EnergyConsumptionDTO::toDTO);
     }
 
     @Transactional(readOnly = true)

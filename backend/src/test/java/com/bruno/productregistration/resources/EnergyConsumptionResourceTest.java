@@ -2,6 +2,7 @@ package com.bruno.productregistration.resources;
 
 import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import com.bruno.productregistration.services.EnergyConsumptionService;
+import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import java.util.Collections;
 
 import static com.bruno.productregistration.resources.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -88,7 +90,7 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
-    @DisplayName("(3) When GET is called to find all energy consumption data then return 200 ok status")
+    @DisplayName("(3) When GET is called to find all energy consumption data then return 200 Ok status")
     void whenGETIsCalledToFindAllEnergyConsumptionDataThenReturnOkStatus() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 20);
         Page<EnergyConsumptionDTO> page = new PageImpl(Collections.singletonList(goodDTO));
@@ -96,5 +98,27 @@ public class EnergyConsumptionResourceTest {
         mockMvc.perform(MockMvcRequestBuilders.get(URN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("(4) When GET is called to find energy consumption data by a valid id then return 200 Ok Status")
+    void whenGETIsCalledToFindDataByAValidIdThenReturnOkStatus() throws Exception {
+        when(energyConsumptionService.findById(goodDTO.getName())).thenReturn(goodDTO);
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/id/" + goodDTO.getName())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(goodDTO.getName())))
+                .andExpect(jsonPath("$.power", is(goodDTO.getPower())))
+                .andExpect(jsonPath("$.monthlyUsage", is(goodDTO.getMonthlyUsage())))
+                .andExpect(jsonPath("$.dailyUse", is(goodDTO.getDailyUse())))
+                .andExpect(jsonPath("$.monthlyConsumptionAverage", is(goodDTO.getMonthlyConsumptionAverage())));
+    }
+    @Test
+    @DisplayName("(5) When GET is called to find energy consumption data by an invalid id then return 404 Not Found Status")
+    void whenGETIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception {
+        doThrow(ResourceNotFoundException.class).when(energyConsumptionService).findById(badDTO.getName());
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/id/" + badDTO.getName())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

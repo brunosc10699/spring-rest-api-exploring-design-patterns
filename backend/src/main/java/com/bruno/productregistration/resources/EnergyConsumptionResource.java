@@ -34,4 +34,9 @@ public class EnergyConsumptionResource {
         return ResponseEntity.ok(energyConsumptionService.findAll(pageable));
     }
 
+    @GetMapping(value = "/id/{id}")
+    public ResponseEntity<EnergyConsumptionDTO> findById(@PathVariable String id){
+        return ResponseEntity.ok(energyConsumptionService.findById(id));
+    }
+
 }

@@ -118,7 +118,7 @@ public class HomeApplianceResourceTest {
     @DisplayName("(4) When GET is called to find a product by id, then OK status is returned")
     void whenGETIsCalledToFindAProductByIdThenReturnOkStatus() throws Exception {
         when(homeApplianceService.findById(goodDTO.getId())).thenReturn(goodDTO);
-        mockMvc.perform(MockMvcRequestBuilders.get(URN + goodDTO.getId())
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/id/" + goodDTO.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(goodDTO.getId())))
@@ -136,7 +136,7 @@ public class HomeApplianceResourceTest {
     @DisplayName("(5) When GET is called with an invalid id, then return a 404 not found status")
     void whenGETIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception{
         doThrow(ResourceNotFoundException.class).when(homeApplianceService).findById(badDTO.getId());
-        mockMvc.perform(MockMvcRequestBuilders.get(URN + badDTO.getId())
+        mockMvc.perform(MockMvcRequestBuilders.get(URN + "/id/" + badDTO.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }

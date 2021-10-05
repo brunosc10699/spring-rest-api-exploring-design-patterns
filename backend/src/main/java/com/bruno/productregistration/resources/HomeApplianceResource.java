@@ -34,7 +34,7 @@ public class HomeApplianceResource {
         return ResponseEntity.ok(homeApplianceService.findAll(pageable));
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/id/{id}")
     public ResponseEntity<HomeApplianceDTO> findById(@PathVariable String id){
         return ResponseEntity.ok(homeApplianceService.findById(id));
     }

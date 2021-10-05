@@ -44,4 +44,10 @@ public class EnergyConsumptionResource {
         return ResponseEntity.ok(energyConsumptionService.update(id, consumptionDTO));
     }
 
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id){
+        energyConsumptionService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

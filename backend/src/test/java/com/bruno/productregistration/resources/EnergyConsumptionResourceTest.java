@@ -18,14 +18,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.util.Collections;
 
 import static com.bruno.productregistration.resources.utils.JsonConversionUtil.asJsonString;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -146,5 +146,30 @@ public class EnergyConsumptionResourceTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("(8) When PUT is called to update energy consumption with a bad payload then return 400 Bad Request status")
+    void whenPUTIsCalledToUpdateDataWithABadPayloadThenReturnBadRequestStatus() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put(URN + badDTO.getName())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(badDTO)))
+                .andExpect(status().isBadRequest());
+    }
 
+    @Test
+    @DisplayName("(9) When DELETE is called with a valid id then return 204 No Content status")
+    void whenDELETEIsCalledWithAValidIdThenReturnNoContentStatus() throws Exception {
+        doNothing().when(energyConsumptionService).delete(goodDTO.getName());
+        mockMvc.perform(MockMvcRequestBuilders.delete(URN + goodDTO.getName())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("(10) When DELETE is called with an invalid id then return 404 Not Found status")
+    void whenDELETEIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception {
+        doThrow(ResourceNotFoundException.class).when(energyConsumptionService).delete(goodDTO.getName());
+        mockMvc.perform(MockMvcRequestBuilders.delete(URN + goodDTO.getName())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }

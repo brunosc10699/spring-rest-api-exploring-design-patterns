@@ -22,31 +22,46 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final Environment environment;
 
     private static final String[] PUBLIC_MATCHERS = {
-            "/h2-console/**"
+            "/h2-console/**",
+            "/actuator/health"
     };
 
     private static final String[] PUBLIC_MATCHERS_GET = {
-            "/api/v1/appliances/**"
+            "/api/v1/appliances/**",
+            "/api/v1/consumptions/**"
     };
 
     private static final String[] PUBLIC_MATCHERS_POST = {
-            "/api/v1/appliances/**"
+            "/api/v1/appliances/**",
+            "/api/v1/consumptions/**"
+    };
+
+    private static final String[] PUBLIC_MATCHERS_PUT = {
+            "/api/v1/appliances/**",
+            "/api/v1/consumptions/**"
+    };
+
+    private static final String[] PUBLIC_MATCHERS_DELETE = {
+            "/api/v1/appliances/**",
+            "/api/v1/consumptions/**"
     };
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        if(Arrays.asList(environment.getActiveProfiles()).contains("test"))
+        if (Arrays.asList(environment.getActiveProfiles()).contains("test"))
             httpSecurity.headers().frameOptions().disable();
         httpSecurity.cors().and().csrf().disable();
-        httpSecurity.authorizeRequests()
-                .antMatchers(PUBLIC_MATCHERS)
-                .permitAll()
-                .antMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET)
-                .permitAll()
-                .antMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST)
-                .permitAll()
-                .anyRequest()
-                .authenticated();
+        if (!Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
+            httpSecurity.authorizeRequests().anyRequest().permitAll();
+        } else {
+            httpSecurity.authorizeRequests()
+                    .antMatchers(PUBLIC_MATCHERS)
+                    .permitAll()
+                    .antMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET)
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated();
+        }
     }
 
     @Bean

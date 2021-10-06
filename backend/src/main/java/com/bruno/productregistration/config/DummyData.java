@@ -1,6 +1,5 @@
 package com.bruno.productregistration.config;
 
-import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import com.bruno.productregistration.entities.EnergyConsumption;
 import com.bruno.productregistration.entities.HomeAppliance;
 import com.bruno.productregistration.repositories.EnergyConsumptionRepository;
@@ -10,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -40,7 +37,7 @@ public class DummyData implements CommandLineRunner {
             energyConsumptionRepository.save(consumption);
 
             HomeAppliance homeAppliance = HomeAppliance.builder()
-                    .id(UUID.randomUUID().toString())
+                    .id("eba9031b-b87d-4b91-9afd-9a1e0387a9bf")
                     .name("Enceradeira")
                     .description("Enceradeira para piso sintético")
                     .price(0.0)

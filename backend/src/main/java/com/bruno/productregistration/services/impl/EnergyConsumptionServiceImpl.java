@@ -37,6 +37,7 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
         return consumptionDTO;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<EnergyConsumptionDTO> findAll(Pageable pageable) {
         return energyConsumptionRepository.findAll(pageable).map(EnergyConsumptionDTO::toDTO);
@@ -44,21 +45,28 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
 
     @Transactional(readOnly = true)
     @Override
-    public EnergyConsumptionDTO findByNameIgnoreCase(EnergyConsumptionDTO consumptionDTO) {
+    public EnergyConsumption findByNameIgnoreCase(EnergyConsumptionDTO consumptionDTO) {
         return energyConsumptionRepository.findByNameIgnoreCase(consumptionDTO.getName())
                 .orElseGet(() -> {
                     try {
-                        EnergyConsumptionDTO newConsumption = energyConsumptionAPIService.getConsumption(consumptionDTO.getName());
+                        EnergyConsumption newConsumption = energyConsumptionAPIService.getConsumption(consumptionDTO.getName());
                         return newConsumption;
                     } catch (FeignException e) {
                         log.info("Energy consumptionDTO information about " + consumptionDTO.getName() + " was not found!");
                     } catch (NullPointerException e) {
                         log.info(e.getLocalizedMessage());
                     }
-                    return consumptionDTO;
+                    return EnergyConsumption.builder()
+                            .name(consumptionDTO.getName())
+                            .power(consumptionDTO.getPower())
+                            .monthlyUsage(consumptionDTO.getMonthlyUsage())
+                            .dailyUse(consumptionDTO.getDailyUse())
+                            .monthlyConsumptionAverage(consumptionDTO.getMonthlyConsumptionAverage())
+                            .build();
                 });
     }
 
+    @Transactional(readOnly = true)
     @Override
     public EnergyConsumptionDTO findById(String id) {
         EnergyConsumption consumption = energyConsumptionRepository.findById(id)
@@ -84,8 +92,8 @@ public class EnergyConsumptionServiceImpl implements EnergyConsumptionService {
         try {
             if (consumptionDTO.getName().length() > 2) {
                 Integer power = consumptionDTO.getPower();
-                EnergyConsumptionDTO consumption = findByNameIgnoreCase(consumptionDTO);
-                return consumption;
+                EnergyConsumption consumption = findByNameIgnoreCase(consumptionDTO);
+                return EnergyConsumptionDTO.toDTO(consumption);
             }
         } catch (NullPointerException e) {
             log.info("One of the energy consumption object attribute was null!");

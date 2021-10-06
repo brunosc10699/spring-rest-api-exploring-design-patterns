@@ -11,7 +11,7 @@ public interface EnergyConsumptionService {
 
     Page<EnergyConsumptionDTO> findAll(Pageable pageable);
 
-    EnergyConsumptionDTO findByNameIgnoreCase(EnergyConsumptionDTO consumptionDTO);
+    EnergyConsumption findByNameIgnoreCase(EnergyConsumptionDTO consumptionDTO);
 
     EnergyConsumptionDTO findById(String id);
 

@@ -1,5 +1,6 @@
 package com.bruno.productregistration.entities.enums;
 
+import com.bruno.productregistration.services.exceptions.IncorrectValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,10 +21,10 @@ public enum Classification {
     private String description;
     
     public static Classification toEnum(Integer code){
-        if(code == null) return null;
+        if(code == null) throw new IncorrectValueException("The classification code is null!");
         for(Classification classification : Classification.values()){
             if(code == classification.getCode()) return classification;
         }
-        throw new IllegalArgumentException("Invalid code: " + code);
+        throw new IllegalArgumentException("Invalid classification code: " + code);
     }
 }

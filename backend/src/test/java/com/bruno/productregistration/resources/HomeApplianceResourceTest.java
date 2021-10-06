@@ -1,7 +1,6 @@
 package com.bruno.productregistration.resources;
 
 import com.bruno.productregistration.dto.HomeApplianceDTO;
-import com.bruno.productregistration.entities.HomeAppliance;
 import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import com.bruno.productregistration.services.impl.HomeApplianceServiceImpl;
 import org.junit.jupiter.api.BeforeEach;

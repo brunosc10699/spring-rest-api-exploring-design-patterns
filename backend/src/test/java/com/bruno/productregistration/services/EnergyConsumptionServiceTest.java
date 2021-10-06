@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -114,20 +113,20 @@ public class EnergyConsumptionServiceTest {
     @Test
     @DisplayName("(5) When a name is given then return an object of EnergyConsumption")
     void whenANameIsGivenThenReturnAnOptionalObject() {
-        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.findByNameIgnoreCase(goodDTO);
+        EnergyConsumption consumption = energyConsumptionService.findByNameIgnoreCase(goodDTO);
         assertAll(
-                () -> assertThat(consumptionDTO.getName(), is(equalTo(goodObject.getName()))),
-                () -> assertThat(consumptionDTO.getPower(), is(equalTo(goodObject.getPower())))
+                () -> assertThat(consumption.getName(), is(equalTo(goodObject.getName()))),
+                () -> assertThat(consumption.getPower(), is(equalTo(goodObject.getPower())))
         );
     }
 
     @Test
     @DisplayName("(6) When an object is not found by its name in the database nor in the api, then return the same object")
     void whenAnObjectIsNotFoundThenReturnTheSameObject() {
-        EnergyConsumptionDTO consumptionDTO = energyConsumptionService.findByNameIgnoreCase(goodDTO);
+        EnergyConsumption consumption = energyConsumptionService.findByNameIgnoreCase(goodDTO);
         assertAll(
-                () -> assertThat(consumptionDTO.getName(), is(equalTo(goodObject.getName()))),
-                () -> assertThat(consumptionDTO.getPower(), is(equalTo(goodObject.getPower())))
+                () -> assertThat(consumption.getName(), is(equalTo(goodObject.getName()))),
+                () -> assertThat(consumption.getPower(), is(equalTo(goodObject.getPower())))
         );
     }
 

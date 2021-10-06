@@ -2,6 +2,7 @@ package com.bruno.productregistration.resources;
 
 import com.bruno.productregistration.dto.EnergyConsumptionDTO;
 import com.bruno.productregistration.services.EnergyConsumptionService;
+import com.bruno.productregistration.services.exceptions.ExistingResourceException;
 import com.bruno.productregistration.services.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.util.Collections;
@@ -88,6 +88,17 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
+    @DisplayName("(3) When POST is called with an existent id then return 400 bad request status")
+    void whePOSTIsCalledWithAnExistentIdThenReturnBadRequestStatus() throws Exception {
+        EnergyConsumptionDTO registeredName = EnergyConsumptionDTO.builder().name("Vacuum").power(200).build();
+        doThrow(ExistingResourceException.class).when(energyConsumptionService).save(registeredName);
+        mockMvc.perform(post(URN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(registeredName)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("(3) When GET is called to find all energy consumption data then return 200 Ok status")
     void whenGETIsCalledToFindAllEnergyConsumptionDataThenReturnOkStatus() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 20);
@@ -99,7 +110,7 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
-    @DisplayName("(4) When GET is called to find energy consumption data by a valid id then return 200 Ok Status")
+    @DisplayName("(5) When GET is called to find energy consumption data by a valid id then return 200 Ok Status")
     void whenGETIsCalledToFindDataByAValidIdThenReturnOkStatus() throws Exception {
         when(energyConsumptionService.findById(goodDTO.getName())).thenReturn(goodDTO);
         mockMvc.perform(MockMvcRequestBuilders.get(URN + "/id/" + goodDTO.getName())
@@ -113,7 +124,7 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
-    @DisplayName("(5) When GET is called to find energy consumption data by an invalid id then return 404 Not Found Status")
+    @DisplayName("(6) When GET is called to find energy consumption data by an invalid id then return 404 Not Found Status")
     void whenGETIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception {
         doThrow(ResourceNotFoundException.class).when(energyConsumptionService).findById(badDTO.getName());
         mockMvc.perform(MockMvcRequestBuilders.get(URN + "/id/" + badDTO.getName())
@@ -122,7 +133,7 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
-    @DisplayName("(6) When PUT is called to update energy consumption data by a valid id then return 200 Ok status")
+    @DisplayName("(7) When PUT is called to update energy consumption data by a valid id then return 200 Ok status")
     void whenPUTIsCalledToUpdateEnergyConsumptionDataWithAValidIdThenReturnOkStatus() throws Exception {
         when(energyConsumptionService.update(goodDTO.getName(), goodDTO)).thenReturn(goodDTO);
         mockMvc.perform(MockMvcRequestBuilders.put(URN + goodDTO.getName())
@@ -137,7 +148,7 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
-    @DisplayName("(7) When PUT is called to update energy consumption data by an invalid id then return 404 Not Found status")
+    @DisplayName("(8) When PUT is called to update energy consumption data by an invalid id then return 404 Not Found status")
     void whenPUTIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception {
         doThrow(ResourceNotFoundException.class).when(energyConsumptionService).update(goodDTO.getName(), goodDTO);
         mockMvc.perform(MockMvcRequestBuilders.put(URN + goodDTO.getName())
@@ -147,7 +158,7 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
-    @DisplayName("(8) When PUT is called to update energy consumption with a bad payload then return 400 Bad Request status")
+    @DisplayName("(9) When PUT is called to update energy consumption with a bad payload then return 400 Bad Request status")
     void whenPUTIsCalledToUpdateDataWithABadPayloadThenReturnBadRequestStatus() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put(URN + badDTO.getName())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -156,7 +167,7 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
-    @DisplayName("(9) When DELETE is called with a valid id then return 204 No Content status")
+    @DisplayName("(10) When DELETE is called with a valid id then return 204 No Content status")
     void whenDELETEIsCalledWithAValidIdThenReturnNoContentStatus() throws Exception {
         doNothing().when(energyConsumptionService).delete(goodDTO.getName());
         mockMvc.perform(MockMvcRequestBuilders.delete(URN + goodDTO.getName())
@@ -165,7 +176,7 @@ public class EnergyConsumptionResourceTest {
     }
 
     @Test
-    @DisplayName("(10) When DELETE is called with an invalid id then return 404 Not Found status")
+    @DisplayName("(11) When DELETE is called with an invalid id then return 404 Not Found status")
     void whenDELETEIsCalledWithAnInvalidIdThenReturnNotFoundStatus() throws Exception {
         doThrow(ResourceNotFoundException.class).when(energyConsumptionService).delete(goodDTO.getName());
         mockMvc.perform(MockMvcRequestBuilders.delete(URN + goodDTO.getName())

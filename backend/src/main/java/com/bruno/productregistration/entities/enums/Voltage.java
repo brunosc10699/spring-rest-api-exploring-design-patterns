@@ -1,5 +1,6 @@
 package com.bruno.productregistration.entities.enums;
 
+import com.bruno.productregistration.services.exceptions.IncorrectValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,10 +17,10 @@ public enum Voltage {
     private String description;
 
     public static Voltage toEnum(Integer code){
-        if(code == null) return null;
+        if(code == null) throw new IncorrectValueException("The voltage code is null!");
         for(Voltage voltage : Voltage.values()){
             if(code == voltage.getCode()) return voltage;
         }
-        throw new IllegalArgumentException("Invalid code: " + code);
+        throw new IllegalArgumentException("Invalid voltage code: " + code);
     }
 }

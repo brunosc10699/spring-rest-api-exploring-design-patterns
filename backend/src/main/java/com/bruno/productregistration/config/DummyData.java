@@ -26,7 +26,7 @@ public class DummyData implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        if (!activeProfile.equals("prod")) {
+        if (activeProfile.equals("test")) {
             EnergyConsumption consumption = EnergyConsumption.builder()
                     .name("Enceradeira")
                     .power(180)
